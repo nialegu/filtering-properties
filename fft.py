@@ -22,7 +22,7 @@ def FFT(x):
         factor = np.exp(-2j * np.pi * np.arange(N) / N)
         return np.concatenate([
             X_even + factor[:N // 2] * X_odd,
-            X_even - factor[N // 2:] * X_odd # + ?
+            X_even + factor[N // 2:] * X_odd 
         ])
     
     

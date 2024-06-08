@@ -8,7 +8,6 @@ def get_sequence(x0, n_iterations):
     return x
 
 def getData():
-    # Initialize parameters
     initial_value = 0.1
     iterations = 100
     data = get_sequence(initial_value, iterations)

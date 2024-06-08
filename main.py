@@ -11,32 +11,50 @@ import data.smooth_signal as sms
 import fft as fft
 
 def getTimeForFftAndDftForCompare(data):
-    dft_time = timeit.timeit(lambda: fft.FFT(data), number=1)
+    dft_time = timeit.timeit(lambda: fft.FFT(data), number=50)
     print('\nDFT time:', dft_time, 'secs.')
-    fft_time = timeit.timeit(lambda: fft.FFT(data), number=1)
+    fft_time = timeit.timeit(lambda: fft.FFT(data), number=50)
     print('FFT time:', fft_time, 'secs.')
     print('FFT', 'faster than' if (dft_time > fft_time) else 'slower than', 'DFT\n')
 
 def removeTrend(data):
     plt.plot(data, label='original')
-    # detect and remove jumps
-    jmps = np.where(np.diff(data) < -0.5)[0]  # find large, rapid drops in amplitdue
+    # find large, rapid drops in amplitdue
+    jmps = np.where(np.diff(data) < -0.5)[0]
     for j in jmps:
         data[j+1:] += data[j] - data[j+1]    
-    plt.plot(data, label='unrolled')
+    # plt.plot(data, label='unrolled')
     # detrend with a low-pass
     order = 16
-    data -= sps.filtfilt([1] * order, [order], data)  # this is a very simple moving average filter
+    data -= sps.filtfilt([1] * order, [order], data) 
     plt.plot(data, label='detrended')
     plt.legend(loc='best')
+    plt.show()
     return data
 
 def FFT(data):
-    result = fft.FFT(data)
-    # result = scipyfft.fft(data)
-    # print("Result:", result)
-    plt.plot(result, label='fft-transform')
+    # fft_result = fft.FFT(data)
+
+    fs = 1000 # ???
+    fft_result = fft.FFT(data)
+    fft_freq = np.fft.fftfreq(len(data), 1/fs)
+    # Определение индексов положительных частот
+    positive_freqs = fft_freq > 0
+    # Получение магнитуды спектра и соответствующих частот
+    magnitude = np.abs(fft_result[positive_freqs])
+    frequencies = fft_freq[positive_freqs]
+    # Нахождение верхней и нижней частоты сигнала
+    lower_freq = frequencies[np.argmax(magnitude > 0)]
+    upper_freq = frequencies[np.argmax(magnitude[::-1] > 0)]
+    print(f"Нижняя частота сигнала: {lower_freq} Гц")
+    print(f"Верхняя частота сигнала: {upper_freq} Гц")
+    plt.plot(frequencies, magnitude)
+    plt.title('Спектр сигнала')
+    plt.xlabel('Частота (Гц)')
+    plt.ylabel('Амплитуда')
+    # plt.plot(fft_result, label='fft-transform')
     plt.legend(loc='best')
+
     plt.show()
 
 def main(data):
@@ -65,54 +83,15 @@ def main(data):
 
 # Одночастотный сигнал
 single_frequency_data = sfs.getData()
+plt.title('Отображение x=sin(wy)')
 main(single_frequency_data)
 
 # Двухчастотный сигнал
 two_frequency_data = tfs.getData()
+plt.title('Отображение x=αsin(w₁*y) + βsin(w₂*y)')
 main(two_frequency_data)
 
 # Отображение гладкой функции
 smooth_displaying_data = sms.getData()
+plt.title('Отображение xₙ₊₁=4(1-xₙ)xₙ')
 main(smooth_displaying_data)
-
-
-
-# Ни фильтрация, ни простое определение тренда не принесут вам никакой пользы с этим сигналом. 
-# Первая проблема заключается в том, что тренд носит несколько периодический характер. 
-# Вторая проблема заключается в том, что периодичность не является стационарной. 
-# Я считаю, что линейные методы не решат проблему.
-# Я предлагаю вам сделать следующее:
-
-# 1) удалить переходы ("развернуть пилообразный сигнал")
-# 2) затем измените тренд сигнала с помощью фильтра нижних частот или чего-то еще
-# Вот пример:
-
-np.random.seed(123)
-
-# create an example signal
-x = []
-ofs = 3.4
-slope = 0.002
-for t in np.linspace(0, 100, 1000):
-    ofs += slope    
-    x.append(np.sin(t*2) * 0.1 + ofs)
-    if x[-1] > 4:
-        ofs =3.2
-        slope = np.random.rand() * 0.003 + 0.002
-x = np.asarray(x)    
-plt.plot(x, label='original')
-
-# detect and remove jumps
-jmps = np.where(np.diff(x) < -0.5)[0]  # find large, rapid drops in amplitdue
-for j in jmps:
-    x[j+1:] += x[j] - x[j+1]    
-plt.plot(x, label='unrolled')
-
-# detrend with a low-pass
-order = 200
-x -= sps.filtfilt([1] * order, [order], x)  # this is a very simple moving average filter
-plt.plot(x, label='detrended')
-
-plt.legend(loc='best')
-# FFT(x)
-plt.show()
