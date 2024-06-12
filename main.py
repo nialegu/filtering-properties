@@ -7,6 +7,7 @@ import timeit
 import data.single_frequency_signal as sfs
 import data.two_frequency_signal as tfs
 import data.smooth_signal as sms
+import data.two_dimensions_signal as tds
 
 import fft as fft
 
@@ -55,8 +56,6 @@ def FFT(data):
     plt.ylabel('Амплитуда')
     plt.legend(loc='best')
 
-    plt.show()
-
 def main(data):
     data = np.asarray(data, dtype=float)
     data = removeTrend(data)
@@ -80,18 +79,37 @@ def main(data):
 
     FFT(data)
     getTimeForFftAndDftForCompare(data)
+    plt.show()
 
-# Одночастотный сигнал
-single_frequency_data = sfs.getData()
-plt.title('x=sin(wy)')
-main(single_frequency_data)
+# # Одночастотный сигнал
+# single_frequency_data = sfs.getData()
+# plt.title('x=sin(wy)')
+# main(single_frequency_data)
 
-# Двухчастотный сигнал
-two_frequency_data = tfs.getData()
-plt.title('x=αsin(w₁*y) + βsin(w₂*y)')
-main(two_frequency_data)
+# # Двухчастотный сигнал
+# two_frequency_data = tfs.getData()
+# plt.title('x=αsin(w₁*y) + βsin(w₂*y)')
+# main(two_frequency_data)
 
-# Отображение гладкой функции
-smooth_displaying_data = sms.getData()
-plt.title('xₙ₊₁=4(1-xₙ)xₙ')
-main(smooth_displaying_data)
+# # Отображение гладкой функции
+# smooth_displaying_data = sms.getData()
+# plt.title('xₙ₊₁=4(1-xₙ)xₙ')
+# main(smooth_displaying_data)
+
+# # # -------------------- # # #
+
+def tds_main(data_1, data_2, data_3):
+    # data_1 = removeTrend(data_1)
+    # data_2 = removeTrend(data_2)
+    # data_3 = removeTrend(data_3)
+
+    FFT(data_1)
+    FFT(data_2)
+    FFT(data_3)
+
+tds_1 = tds.getFirstData()
+tds_2 = tds.getSecondData()
+tds_3 = tds.getThirdData()
+plt.title('yₙ₊₁=f(ayₙ+byₙ₋₁)')
+tds_main(tds_1, tds_2, tds_3)
+plt.show()
