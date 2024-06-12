@@ -15,7 +15,8 @@ def FFT(x):
     if N <= 32:
         return DFT(x)
     elif N % 2 > 0:
-        raise ValueError("The variable of x must be even")
+        return DFT(x)
+        # raise ValueError("The variable of x must be even")
     else:
         X_even = FFT(x[::2])
         X_odd = FFT(x[1::2])

@@ -34,6 +34,7 @@ def removeTrend(data):
 
 def FFT(data):
     # fft_result = fft.FFT(data)
+    # plt.plot(fft_result, label='fft-transform')
 
     fs = 1000 # ???
     fft_result = fft.FFT(data)
@@ -52,7 +53,6 @@ def FFT(data):
     plt.title('Спектр сигнала')
     plt.xlabel('Частота (Гц)')
     plt.ylabel('Амплитуда')
-    # plt.plot(fft_result, label='fft-transform')
     plt.legend(loc='best')
 
     plt.show()
@@ -83,15 +83,15 @@ def main(data):
 
 # Одночастотный сигнал
 single_frequency_data = sfs.getData()
-plt.title('Отображение x=sin(wy)')
+plt.title('x=sin(wy)')
 main(single_frequency_data)
 
 # Двухчастотный сигнал
 two_frequency_data = tfs.getData()
-plt.title('Отображение x=αsin(w₁*y) + βsin(w₂*y)')
+plt.title('x=αsin(w₁*y) + βsin(w₂*y)')
 main(two_frequency_data)
 
 # Отображение гладкой функции
 smooth_displaying_data = sms.getData()
-plt.title('Отображение xₙ₊₁=4(1-xₙ)xₙ')
+plt.title('xₙ₊₁=4(1-xₙ)xₙ')
 main(smooth_displaying_data)
