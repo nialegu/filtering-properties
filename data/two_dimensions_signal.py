@@ -1,6 +1,6 @@
 import numpy as np
 
-n_iterations = 50
+n_iterations = 100
 y_0 = 0.123
 y_1 = 0.456
 
@@ -12,7 +12,7 @@ def f(a, b):
         z = a*y[n-1] + b*y[n-2]
         while(abs(z) > 1):
             if (z > 1): z -= 2
-            else: z += 2 # if z<1 
+            else: z += 2
         y[n] = z
     return y
 

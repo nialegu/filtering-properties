@@ -16,14 +16,16 @@ def getTimeForFftAndDftForCompare(data):
     print('\nDFT time:', dft_time, 'secs.')
     fft_time = timeit.timeit(lambda: fft.FFT(data), number=50)
     print('FFT time:', fft_time, 'secs.')
-    print('FFT', 'faster than' if (dft_time > fft_time) else 'slower than', 'DFT\n')
+    print('FFT', 'faster than' 
+          if (dft_time > fft_time) 
+          else 'slower than', 'DFT\n')
 
 def removeTrend(data):
     plt.plot(data, label='original')
     # find large, rapid drops in amplitdue
     jmps = np.where(np.diff(data) < -0.5)[0]
     for j in jmps:
-        data[j+1:] += data[j] - data[j+1]    
+        data[j+1:] += data[j] - data[j+1]
     # plt.plot(data, label='unrolled')
     # detrend with a low-pass
     order = 16
@@ -76,7 +78,7 @@ def test(data):
         if (i != 0 and data[i-1]<0<n):
             result.append(data[last_index:i])
             if (round(np.mean(data[last_index:i])) == 0):
-                print()
+                print("?")
             last_index = i+1
         i += 1
     
@@ -88,33 +90,55 @@ def main(data):
     data = removeTrend(data)
     print('Mathematical expectation:', np.mean(data))
     data = test(data)
-    for arr in data:
-        FFT(arr)
-    # FFT(data)
-    # getTimeForFftAndDftForCompare(data)
+    # for arr in data:
+    #     FFT(arr)
+    FFT(data)
+    getTimeForFftAndDftForCompare(data)
     plt.show()
 
-# # Одночастотный сигнал
-# single_frequency_data = sfs.getData()
-# plt.title('x=sin(wy)')
-# main(single_frequency_data)
+# Одночастотный сигнал
+single_frequency_data = sfs.getData()
+plt.title('x=sin(wy)')
+main(single_frequency_data)
 
-# # Двухчастотный сигнал
-# two_frequency_data = tfs.getData()
-# plt.title('x=αsin(w₁*y) + βsin(w₂*y)')
-# main(two_frequency_data)
+# Двухчастотный сигнал
+two_frequency_data = tfs.getData()
+plt.title('x=αsin(w₁*y) + βsin(w₂*y)')
+main(two_frequency_data)
 
-# # Отображение гладкой функции
-# smooth_displaying_data = sms.getData()
-# plt.title('xₙ₊₁=4(1-xₙ)xₙ')
-# main(smooth_displaying_data)
+# Отображение гладкой функции
+smooth_displaying_data = sms.getData()
+plt.title('xₙ₊₁=4(1-xₙ)xₙ')
+main(smooth_displaying_data)
 
 # # # -------------------- # # #
 
+def phase_portrait(data):
+    y_n = data
+    y_n_plus_1 = y_n[1:] + [0]
+    plt.plot(y_n[:-1], y_n_plus_1, 'bo', label='Точки (yₙ, yₙ₊₁)')
+    plt.xlim(-1.5, 1.5)
+    plt.ylim(-1.5, 1.5)
+    plt.xlabel('yₙ')
+    plt.ylabel('yₙ₊₁')
+    plt.title('Фазовый портрет для дискретной системы')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+
 def tds_main(data_1, data_2, data_3):
-    data_1 = removeTrend(data_1)
-    data_2 = removeTrend(data_2)
-    data_3 = removeTrend(data_3)
+    phase_portrait(data_1)
+    phase_portrait(data_2)
+    phase_portrait(data_3)
+
+    plt.plot(data_1, label='original')
+    plt.legend(loc='best')
+    plt.show()
+    # data_1 = removeTrend(data_1)
+    # data_2 = removeTrend(data_2)
+    # data_3 = removeTrend(data_3)
+
     FFT(data_1)
     FFT(data_2)
     FFT(data_3)
@@ -125,3 +149,38 @@ tds_2 = tds.getSecondData()
 tds_3 = tds.getThirdData()
 plt.title('yₙ₊₁=f(ayₙ+byₙ₋₁)')
 tds_main(tds_1, tds_2, tds_3)
+
+#########################################
+
+# # Задаем систему уравнений, например, x' = y, y' = -x
+# def system(state, t):
+#     x, y = state
+#     return y, -x
+
+# # Создаем сетку точек для фазового портрета
+# y1, y2 = np.meshgrid(np.linspace(-2, 2, 20), np.linspace(-2, 2, 20))
+
+# # Вычисляем производные в каждой точке сетки
+# u, v = np.zeros(y1.shape), np.zeros(y2.shape)
+# NI, NJ = y1.shape
+# for i in range(NI):
+#     for j in range(NJ):
+#         x = y1[i, j]
+#         y = y2[i, j]
+#         state_derivatives = system([x, y], 0)
+#         u[i,j] = state_derivatives[0]
+#         v[i,j] = state_derivatives[1]
+
+# # Нормализуем стрелки
+# norm = np.sqrt(u**2 + v**2)
+# u /= norm
+# v /= norm
+
+# # Рисуем фазовый портрет
+# plt.quiver(y1, y2, u, v, norm, cmap=plt.cm.jet)
+# plt.xlim(-2, 2)
+# plt.ylim(-2, 2)
+# plt.xlabel('x')
+# plt.ylabel('y')
+# plt.title('Фазовый портрет системы')
+# plt.show()
