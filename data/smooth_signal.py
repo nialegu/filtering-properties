@@ -9,6 +9,6 @@ def get_sequence(x0, n_iterations):
 
 def getData():
     initial_value = 0.1
-    iterations = 100
+    iterations = 200
     data = get_sequence(initial_value, iterations)
     return data

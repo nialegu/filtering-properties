@@ -1,8 +1,8 @@
 import numpy as np
 
-n_iterations = 100
-y_0 = -0.01
-y_1 = 0.01
+n_iterations = 50
+y_0 = 0.123
+y_1 = 0.456
 
 def f(a, b):
     y = np.zeros(n_iterations)
@@ -10,13 +10,10 @@ def f(a, b):
     y[1] = y_1
     for n in range(2, n_iterations):
         z = a*y[n-1] + b*y[n-2]
-        if 1 < z < 3:
-            y[n] = z - 2
-        elif abs(z) <= 1:
-            y[n] = z
-        elif -3 < z < -1:
-            y[n] = z + 2
-        else: break
+        while(abs(z) > 1):
+            if (z > 1): z -= 2
+            else: z += 2 # if z<1 
+        y[n] = z
     return y
 
 def getFirstData():
