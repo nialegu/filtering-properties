@@ -1,6 +1,6 @@
 import numpy as np
 
-n_iterations = 100
+n_iterations = 10000
 y_0 = 0.123
 y_1 = 0.456
 

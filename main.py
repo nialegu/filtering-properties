@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as sps
-# import scipy.fft as scipyfft
 import timeit
 
 import data.single_frequency_signal as sfs
@@ -39,60 +38,73 @@ def FFT(data):
     # fft_result = fft.FFT(data)
     # plt.plot(fft_result, label='fft-transform')
 
-    fs = 1000 # ???
     fft_result = fft.FFT(data)
-    fft_freq = np.fft.fftfreq(len(data), 1/fs)
+    fft_freq = np.fft.fftfreq(len(data))
     # Определение индексов положительных частот
     positive_freqs = fft_freq > 0
     # Получение магнитуды спектра и соответствующих частот
     magnitude = np.abs(fft_result[positive_freqs])
     frequencies = fft_freq[positive_freqs]
-    # # Нахождение верхней и нижней частоты сигнала
-    # lower_freq = frequencies[np.argmax(magnitude > 0)]
-    # upper_freq = frequencies[np.argmax(magnitude[::-1] > 0)]
-    # print(f"Нижняя частота сигнала: {lower_freq} Гц")
-    # print(f"Верхняя частота сигнала: {upper_freq} Гц")
     plt.plot(frequencies, magnitude)
     plt.title('Спектр сигнала')
     plt.xlabel('Частота (Гц)')
     plt.ylabel('Амплитуда')
     plt.legend(loc='best')
 
-def signalDivider(data):
-    index = 0
-    p = 10
-    slicer = p - 1
-    result = np.asarray([], dtype=float)
-    while(slicer <= data.size):
-        print(index, slicer)
-        result = np.append(result, fft.FFT(data[index:slicer]), axis=None)
-        slicer += p
-        index += p
-    return result
+# def oldDivider(data, p):
+#     index = 0
+#     p = 10
+#     slicer = p - 1
+#     result = np.asarray([], dtype=float)
+#     while(slicer <= data.size):
+#         print(index, slicer)
+#         result = np.append(result, fft.FFT(data[index:slicer]), axis=None)
+#         slicer += p
+#         index += p
+#     return result
 
-def test(data):
-    i = 0
-    last_index = 0
-    result = []
-    for n in data:
-        if (i != 0 and data[i-1]<0<n):
-            result.append(data[last_index:i])
-            if (round(np.mean(data[last_index:i])) == 0):
-                print("?")
-            last_index = i+1
-        i += 1
+# def test(data):
+#     i = 0
+#     last_index = 0
+#     result = []
+#     for n in data:
+#         if (i != 0 and data[i-1]<0<n):
+#             result.append(data[last_index:i])
+#             if (round(np.mean(data[last_index:i])) == 0):
+#                 print("?")
+#             last_index = i+1
+#         i += 1
     
-    return result
+#     return result
 
+def signalDivider(data, p):
+    if (p < 20):
+        return ValueError('P is very small')
+    data = np.asarray(data, dtype=float) 
+    rem = data.size % p
+    if (rem != 0):
+        data = data[:-rem]
+    result = []
+    slicer_index = p - 1
+    last_index = 0
+    while(slicer_index < data.size - 1):
+        result.append(data[last_index:slicer_index])
+        last_index += p
+        slicer_index += p
+
+    for data_n in result:
+        if (round(np.mean(data_n) / 10) != 0): 
+            return ValueError('P was wrong!')
+    return result
 
 def main(data):
     data = np.asarray(data, dtype=float)
     data = removeTrend(data)
     print('Mathematical expectation:', np.mean(data))
-    data = test(data)
-    # for arr in data:
-    #     FFT(arr)
-    FFT(data)
+    data = signalDivider(data, 40)
+    for arr in data:
+        FFT(arr)
+    # FFT(data)
     getTimeForFftAndDftForCompare(data)
     plt.show()
 
@@ -129,8 +141,8 @@ def phase_portrait(data):
 
 def tds_main(data_1, data_2, data_3):
     phase_portrait(data_1)
-    phase_portrait(data_2)
-    phase_portrait(data_3)
+    # phase_portrait(data_2)
+    # phase_portrait(data_3)
 
     plt.plot(data_1, label='original')
     plt.legend(loc='best')
